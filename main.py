@@ -6,7 +6,7 @@ from pykinect2 import PyKinectRuntime
 # ---- plot graph ------
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D, proj3d
 import matplotlib.animation as animation
 import time
 
@@ -41,13 +41,14 @@ bone_list = np.array(bone_list) - 1
 ###---------------------  Plot Graph ---------------------------###
 ###################################################################
 
-# call each timestep
-def update_lines(num, kinect_obj, lines, bone_list):    
+
+# call each timestep, num is number of that fram but we don't use it in hear
+def update_lines(num, kinect_obj, lines, bone_list, my_ax):    
     # start_time = time.time()
     joints_data = read_skeleton(kinect_obj)
     if joints_data !=  None:
         x, y, z = joints_data
-        x = x *(-1) # mirror image
+        #x = x *(-1) # mirror image
         # print("x min:", np.min(x)," x max", np.max(x)  )
         # print("y min:", np.min(y)," y max", np.max(y)  )
         # print("z min:", np.min(z)," z max", np.max(z)  )
@@ -57,11 +58,16 @@ def update_lines(num, kinect_obj, lines, bone_list):
             line.set_data([x[bone[0]], x[bone[1]]], [z[bone[0]], z[bone[1]]])
             line.set_3d_properties([y[bone[0]], y[bone[1]]])
 
+        # for i, t in enumerate(annots):
+        #     x_, y_, _ = proj3d.proj_transform(x[i], z[i], y[i], my_ax.get_proj())
+        #     t.set_position((x_,y_))
+        #     t.set_text(str(i+1))
+
     # dif_t = (time.time() - start_time)
     # if dif_t > 0:
     #     print("FPS: ", 1.0 / dif_t )
 
-    return lines
+    return lines, annots
 
 
 def read_skeleton(kinect):
@@ -90,7 +96,6 @@ def read_skeleton(kinect):
                 # z = z[choose_joints]
 
                 return (x, y, z)   
-
     return None
 
 
@@ -103,6 +108,7 @@ ax.set_zlim3d(-1.2, 0.2)
 ax.set_xlabel('x')
 ax.set_ylabel('z')
 ax.set_zlabel('y')
+annots = [ax.text2D(0,0,"POINT") for _ in range(num_joint)]
 
 x = np.array(range(num_joint))
 y = np.array(range(num_joint))
@@ -114,7 +120,7 @@ lines = [ax.plot([x[bone[0]], x[bone[1]]],
 
 
 line_ani = animation.FuncAnimation(fig, update_lines, None,
-                                   fargs=(kinect_obj, lines, bone_list),
+                                   fargs=(kinect_obj, lines, bone_list, ax),
                                    interval=1, blit=False)
 
 # loop
