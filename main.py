@@ -36,11 +36,53 @@ bone_list = [[24,12], [25,12], [12,11], [11,10], [10,9], # right arm
 
 bone_list = np.array(bone_list) - 1
 
+##
+from tensorflow.python.keras import Sequential
+from tensorflow.python.keras.layers import CuDNNLSTM
+from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.layers import Dropout
+
+###################################################################
+###-------------------  Action Recognition ---------------------###
+###################################################################
+
+def create_model(num_frame, num_joint, num_output):
+    model = Sequential()
+    model.add(CuDNNLSTM(50, input_shape=(num_frame, num_joint),return_sequences=False))
+    model.add(Dropout(0.4))#使用Dropout函数可以使模型有更多的机会学习到多种独立的表征
+    model.add(Dense(60) )
+    model.add(Dropout(0.4))
+    model.add(Dense(num_output, activation='softmax'))
+    return model
+
+weights_path = 'pretrain_model/weight-sampling-01-0.94.hdf5' # 15 frame
+max_frame = 15
+num_joint = 25
+model = create_model(max_frame, num_joint*3, 4)
+model.load_weights(weights_path)
 
 ###################################################################
 ###---------------------  Plot Graph ---------------------------###
 ###################################################################
+frame_window = np.empty((0,num_joint*3))
+def predict_action():
+    # new_f = np.array([data_frame.ravel()])
+    frame_window = np.append(frame_window, new_f, axis=0 )
 
+    if frame_window.shape[0] >= max_frame:
+        frame_window_new = frame_window.reshape(1,max_frame, num_joint*3)
+        # print(frame_window_new)
+        result = model.predict(frame_window_new)
+        frame_window = frame_window[1:max_frame]  
+        # 拍球   投球   传球  其他动作
+        # print("'touch ball' 'throw ball', 'pass ball  standing]")
+        
+        v_ = result[0]
+        print("拍球       投球       传球       其他动作")
+        print('{:.2f}       {:.2f}       {:.2f}       {:.2f}'.format(v_[0],v_[1],v_[2],v_[3]))
+
+
+one_frame = np.array([0.0]*75)
 
 # call each timestep, num is number of that fram but we don't use it in hear
 def update_lines(num, kinect_obj, lines, bone_list, my_ax):    
@@ -48,6 +90,12 @@ def update_lines(num, kinect_obj, lines, bone_list, my_ax):
     joints_data = read_skeleton(kinect_obj)
     if joints_data !=  None:
         x, y, z = joints_data
+        one_frame[0::3] = x
+        one_frame[1::3] = y
+        one_frame[2::3] = z
+        # predict_action(one_frame)
+        
+
         #x = x *(-1) # mirror image
         # print("x min:", np.min(x)," x max", np.max(x)  )
         # print("y min:", np.min(y)," y max", np.max(y)  )
@@ -58,10 +106,10 @@ def update_lines(num, kinect_obj, lines, bone_list, my_ax):
             line.set_data([x[bone[0]], x[bone[1]]], [z[bone[0]], z[bone[1]]])
             line.set_3d_properties([y[bone[0]], y[bone[1]]])
 
-        # for i, t in enumerate(annots):
-        #     x_, y_, _ = proj3d.proj_transform(x[i], z[i], y[i], my_ax.get_proj())
-        #     t.set_position((x_,y_))
-        #     t.set_text(str(i+1))
+        for i, t in enumerate(annots):
+            x_, y_, _ = proj3d.proj_transform(x[i], z[i], y[i], my_ax.get_proj())
+            t.set_position((x_,y_))
+            t.set_text(str(i+1))
 
     # dif_t = (time.time() - start_time)
     # if dif_t > 0:
