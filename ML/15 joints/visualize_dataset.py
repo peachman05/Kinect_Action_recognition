@@ -49,10 +49,16 @@ ax.set_ylabel('z')
 ax.set_zlabel('y')
 
 annots = [ax.text2D(0,0,"POINT") for _ in range(num_joint)]
-
+start_time = time.time()
 def update_lines(num, data, lines, bone_list, my_ax):  
     # kinect axis (z is deep)
     # ax.clear()
+
+    global start_time
+    dif_t = (time.time() - start_time)
+    if dif_t > 0:
+        print("FPS: ", 1.0 / dif_t )
+
     x = data[num, 0::3] * -1
     y = data[num, 1::3]
     z = data[num, 2::3] * -1
@@ -69,6 +75,8 @@ def update_lines(num, data, lines, bone_list, my_ax):
         x_, y_, _ = proj3d.proj_transform(x[i], z[i], y[i], my_ax.get_proj())
         t.set_position((x_,y_))
         t.set_text(str(i+1))
+
+    start_time = time.time()
 
     return lines, annots
     # return lines, annotation
