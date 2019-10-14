@@ -15,7 +15,6 @@ bone_list = [
                 [12, 11], [11, 10],#right leg
                 [14, 13], # neck
                 [3, 14],  [14, 6], [6, 12], [12, 9], [9,3] # middle 
-             
              ]
 
 bone_list = np.array(bone_list) - 1
