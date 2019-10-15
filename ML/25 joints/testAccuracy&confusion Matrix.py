@@ -7,10 +7,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sn
 
-from data_helper import reduce_joint_dimension,reform_to_sequence, create_model
+from data_helper import reduce_joint_dimension,reform_to_sequence, create_model, create_2steam_model
 
 
 sequence_length = 25 # timestep
+type_model = '2steam'
+num_joint = 6
+number_feature = num_joint*3
+weights_path = 'keep/weight-2steam-02-0.98_6j.hdf5' # 15 frame
+
 
 path_save = "F:/Master Project/Dataset/Extract_Data/25 joints"
 f_x = open(path_save+"/test_x.pickle",'rb')
@@ -18,25 +23,32 @@ f_y = open(path_save+"/test_y.pickle",'rb')
 origin_test_x = pickle.load(f_x)
 origin_test_y = np.array(pickle.load(f_y))
 
-
 origin_test_x = reduce_joint_dimension(origin_test_x,'6')
-test_x, test_y  = reform_to_sequence( origin_test_x  , origin_test_y, False, sequence_length)
 
 
-weights_path = 'weight-sampling-01-0.96.hdf5' # 15 frame
-max_frame = 25
-num_joint = 6
-model = create_model(max_frame, num_joint*3, 4)
+if type_model == '2steam':
+    model = create_2steam_model(sequence_length, number_feature)
+else:
+    model = create_model(sequence_length, number_feature)
 model.load_weights(weights_path)
 model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
 #### Accuracy
-loss, acc = model.evaluate(test_x, y = test_y, batch_size=384, verbose=0)
+
+if type_model == '2steam':
+    test_x, test_y, test_xdiff  = reform_to_sequence(origin_test_x, origin_test_y, 20000, sequence_length, is_2steam=True)
+    input_model = [test_x, test_xdiff]
+else:
+    test_x, test_y  = reform_to_sequence( origin_test_x  , origin_test_y, 20000, sequence_length)
+    input_model = test_x
+
+loss, acc = model.evaluate(input_model, y = test_y, batch_size=384, verbose=0)
 print(loss,acc)
 
 
 #### Confusion Matrix
-y_pred=model.predict_classes(test_x)
+y_pred_prob = model.predict(input_model)
+y_pred = np.argmax(y_pred_prob, axis=1)
 normalize = True
 cm = confusion_matrix(test_y, y_pred)
 if normalize:

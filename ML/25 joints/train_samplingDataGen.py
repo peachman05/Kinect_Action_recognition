@@ -52,14 +52,45 @@ callbacks_list = [checkpoint]
 test_x, test_y  = reform_to_sequence(origin_test_x, origin_test_y, 10000, sequence_length)
 
 
+### batch Generator
+
+def train_generator(origin_train_x, origin_train_y, batch_size=16):
+    while True:
+        train_x, train_y = reform_to_sequence(origin_train_x, origin_train_y, batch_size, sequence_length)  
+        yield train_x, train_y
+
+
+def validate_generator(test_x, test_y, batch_size=32):
+    while True:
+        yield  test_x[:batch_size], test_y[:batch_size]
+
+
+
 #### Train
 num_epoch = 100
+step_per_epoch = 1000
 
-for i_ep in range(start_epoch+1,num_epoch):
+batch_size = 32
+real_batch = batch_size * len(origin_test_y) ## 32 * 7
+train_gen = train_generator( origin_train_x, origin_train_y, batch_size=real_batch )
+valid_gen = validate_generator(test_x, test_y, batch_size=test_y.shape[0])
+
+
+model.fit_generator(
+    generator=train_gen,
+    epochs=num_epoch,
+    steps_per_epoch=step_per_epoch,
+    validation_data=valid_gen,
+    validation_steps=1,
+    callbacks=callbacks_list,
+)
+
+
+# for i_ep in range(start_epoch+1,num_epoch):
     
-    print('epoch: ', i_ep)
-    train_x, train_y = reform_to_sequence(origin_train_x, origin_train_y, 20000, sequence_length)
-    model.fit(train_x, train_y, epochs=start_epoch+1,
-             validation_data=(test_x,test_y), callbacks=callbacks_list, initial_epoch=start_epoch)
-    print("-----------------------")
+#     print('epoch: ', i_ep)
+#     train_x, train_y = reform_to_sequence(origin_train_x, origin_train_y, 20000, sequence_length)
+#     model.fit(train_x, train_y, epochs=start_epoch+1,
+#              validation_data=(test_x,test_y), callbacks=callbacks_list, initial_epoch=start_epoch)
+#     print("-----------------------")
 
