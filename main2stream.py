@@ -42,6 +42,7 @@ bone_list = np.array(bone_list) - 1
 choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
                                    24, 25, 11, 12, 10, 9, ## right
                                  ]) - 1
+# choose_joints = np.array([range(25)])
 
 ###################################################################
 ###-------------------  Action Recognition ---------------------###
@@ -49,7 +50,7 @@ choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
 
 
 
-weights_path = 'pretrain_model/weight-2steam-02-0.91-add_finger_15_t.hdf5' # 15 frame
+weights_path = 'pretrain_model/up_arm-2steam-0.87-12j_15t.hdf5' # 15 frame
 max_frame = 15
 num_joint = 12
 num_plot_joint = 25
@@ -62,12 +63,16 @@ x_realtime_list = []
 
 one_frame = np.array( [0.0]*num_feature )
 
+threshold = 7
+predict_queue = np.array([3] * threshold)
+action_now = 3 # stand
+
 
 frame_window = np.empty((0,num_feature))
 new_row = np.ones( (1, num_feature))
 def predict_action(new_f):
     # new_f = np.array([data_frame.ravel()])
-    global frame_window
+    global frame_window, action_now
     new_f = np.reshape(new_f, (1,num_feature))
     frame_window = np.append(frame_window, new_f, axis=0 )
     if frame_window.shape[0] >= max_frame:
@@ -82,10 +87,21 @@ def predict_action(new_f):
         result = model.predict([frame_window_new,frame_xdiff_new])
         frame_window = frame_window[1:max_frame]  
         # 拍球   投球   传球  其他动作
-        print("'touch' 'throw' 'pass' 'stand")        
+        # print("'dribble' 'throw' 'pass' 'stand")        
+        class_label = ['dribble', 'throw', 'pass', 'stand']
         v_ = result[0]
+        predict_ind = np.argmax(v_)
+        # print()
+        predict_queue[:-1] = predict_queue[1:]
+        predict_queue[-1] = predict_ind
+
+        counts = np.bincount(predict_queue)
+        # np.argmax(counts)
+        if np.max(counts) >= threshold:
+            action_now = np.argmax(counts)
+        print( "{: <8}  {: <8}".format(class_label[predict_ind], class_label[action_now] ) )
         # print("拍球       投球       传球       其他动作")
-        print('{:.2f}    {:.2f}    {:.2f}    {:.2f}'.format(v_[0],v_[1],v_[2],v_[3]))
+        # print('{:.2f}    {:.2f}    {:.2f}    {:.2f}'.format(v_[0],v_[1],v_[2],v_[3]))
 
 
 ###################################################################
@@ -179,7 +195,7 @@ fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.legend()
 ax.set_xlim3d(-0.8, 0.8)
-ax.set_ylim3d(2, 3) # z-kinect
+ax.set_ylim3d(0, 3) # z-kinect
 ax.set_zlim3d(0, 1.4) # y-kinect
 ax.set_xlabel('x')
 ax.set_ylabel('z')

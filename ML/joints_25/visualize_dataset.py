@@ -20,11 +20,11 @@ bone_list = np.array(bone_list) - 1
 ###################################################################
 ###---------------------  Read Data  ---------------------------###
 ###################################################################
-type_file = "realtime"
+type_file = "dataset"
 
 if type_file == 'dataset':
     path_save = "F:/Master Project/Dataset/Extract_data/25 joints"
-    type_data = 'test'
+    type_data = 'train'
 
     f_x = open("{:}/{:}_x.pickle".format(path_save, type_data),'rb')
     f_y = open("{:}/{:}_y.pickle".format(path_save,type_data),'rb')
@@ -32,7 +32,7 @@ if type_file == 'dataset':
     test_x = pickle.load(f_x)
     test_y = pickle.load(f_y)
 
-    num_video = 4
+    num_video = 2
     data_plot = test_x[num_video] 
 
 elif type_file == 'realtime':
@@ -62,12 +62,12 @@ annots = [ax.text2D(0,0,"POINT") for _ in range(num_joint)]
 start_time = time.time()
 def update_lines(num, data, lines, bone_list, my_ax): 
     global start_time
-
+    num += 10000
     dif_t = (time.time() - start_time)
     # print("Time taken : {0} seconds".format(dif_t))
-    if dif_t > 0:
-        print("FPS: ", 1.0 / dif_t )
-    print(num)
+    # if dif_t > 0:
+    #     print("FPS: ", 1.0 / dif_t )
+    # print(num)
     # kinect axis (z is deep)
     x = data[num, 0::3]
     y = data[num, 1::3]

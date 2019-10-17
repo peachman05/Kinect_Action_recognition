@@ -15,7 +15,7 @@ sequence_length = 15 # timestep
 type_model = '2stream'
 num_joint = 12
 number_feature = num_joint*3
-weights_path = 'weight-2steam-02-0.91-add_finger_15_t.hdf5' # 15 frame
+weights_path = 'weight-2steam-0.87-12j_15t.hdf5' # 15 frame
 
 
 path_save = "F:/Master Project/Dataset/Extract_Data/25 joints"

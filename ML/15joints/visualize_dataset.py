@@ -55,8 +55,8 @@ def update_lines(num, data, lines, bone_list, my_ax):
 
     global start_time
     dif_t = (time.time() - start_time)
-    if dif_t > 0:
-        print("FPS: ", 1.0 / dif_t )
+    # if dif_t > 0:
+    #     print("FPS: ", 1.0 / dif_t )
 
     x = data[num, 0::3] * -1
     y = data[num, 1::3]
@@ -91,7 +91,11 @@ lines = [ax.plot([x[bone[0]], x[bone[1]]],
                  [z[bone[0]], z[bone[1]]],
                  [y[bone[0]], y[bone[1]]])[0] for bone in bone_list]
 
-num_video = 1229
+
+num_video = 1900
+print(len(test_x))
+print(test_y[num_video])
+
 line_ani = animation.FuncAnimation(fig, update_lines, test_x[num_video].shape[0],
                 fargs=(test_x[num_video], lines, bone_list, ax),
                 interval=1, blit=False)

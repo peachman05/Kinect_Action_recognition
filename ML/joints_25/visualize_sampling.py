@@ -9,7 +9,7 @@ from data_helper import reform_to_sequence
 
 import pickle
 
-sequence_length = 20
+sequence_length = 100
 num_joint = 25
 bone_list = [[24,12], [25,12], [12,11], [11,10], [10,9], # right arm
             [22,8] ,[23,8], [8,7], [7,6], [6,5], # left arm

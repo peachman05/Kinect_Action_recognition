@@ -13,7 +13,7 @@ from model_ML import create_2stream_model
 
 
 sequence_length = 15 # timestep
-try_detail = "add_finger_15_t"
+try_detail = "12j_15t"
 
 #### Prepare data
 path_save = "F:/Master Project/Dataset/Extract_Data/25 joints"
@@ -27,8 +27,10 @@ f_y = open(path_save+"/test_y.pickle",'rb')
 origin_test_x = pickle.load(f_x)
 origin_test_y = np.array(pickle.load(f_y))
 
-origin_train_x = reduce_joint_dimension(origin_train_x, '12')
-origin_test_x = reduce_joint_dimension(origin_test_x, '12')
+number_joint = 12
+
+origin_train_x = reduce_joint_dimension(origin_train_x, str(number_joint))
+origin_test_x = reduce_joint_dimension(origin_test_x, str(number_joint))
 
 
 #### Prepare model
@@ -43,14 +45,14 @@ if load_model:
 
 sgd = optimizers.SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False)
 model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
-filepath="weight-2steam-{epoch:02d}-{val_accuracy:.2f}-"+ try_detail +".hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=2, save_best_only=True)
+filepath="weight-2steam-{val_accuracy:.2f}-"+ try_detail +".hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=2, save_best_only=False)
 callbacks_list = [checkpoint]
 
 print(model.summary())
 
 #### Prepare Test Set
-test_x, test_y, test_xdiff  = reform_to_sequence(origin_test_x, origin_test_y, 8000, sequence_length, is_2steam=True)
+test_x, test_y, test_xdiff  = reform_to_sequence(origin_test_x, origin_test_y, 10000, sequence_length, is_2steam=True)
 
 
 ### batch Generator
@@ -91,7 +93,7 @@ num_epoch = 100
 for i_ep in range(start_epoch+1,num_epoch):
     
     print('epoch: ', i_ep)
-    train_x, train_y, train_xdiff = reform_to_sequence(origin_train_x, origin_train_y, 7000, sequence_length, is_2steam=True)
+    train_x, train_y, train_xdiff = reform_to_sequence(origin_train_x, origin_train_y, 5000, sequence_length, is_2steam=True)
     # model.fit({'up_stream': train_x, 'down_stream': train_x},
     #           {'main_output': train_y})
     model.fit([train_x, train_xdiff], train_y, epochs=start_epoch+1,
