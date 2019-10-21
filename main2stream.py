@@ -50,7 +50,7 @@ choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
 
 
 
-weights_path = 'pretrain_model/up_arm-2steam-0.87-12j_15t.hdf5' # 15 frame
+weights_path = 'pretrain_model/up02_2steam-0.86-12j_15t.hdf5' # 15 frame
 max_frame = 15
 num_joint = 12
 num_plot_joint = 25
@@ -63,7 +63,7 @@ x_realtime_list = []
 
 one_frame = np.array( [0.0]*num_feature )
 
-threshold = 7
+threshold = 10
 predict_queue = np.array([3] * threshold)
 action_now = 3 # stand
 
@@ -88,7 +88,7 @@ def predict_action(new_f):
         frame_window = frame_window[1:max_frame]  
         # 拍球   投球   传球  其他动作
         # print("'dribble' 'throw' 'pass' 'stand")        
-        class_label = ['dribble', 'throw', 'pass', 'stand']
+        class_label = ['dribble', 'shoot', 'pass', 'stand']
         v_ = result[0]
         predict_ind = np.argmax(v_)
         # print()

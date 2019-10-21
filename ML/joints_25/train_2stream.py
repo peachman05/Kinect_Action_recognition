@@ -52,7 +52,7 @@ callbacks_list = [checkpoint]
 print(model.summary())
 
 #### Prepare Test Set
-test_x, test_y, test_xdiff  = reform_to_sequence(origin_test_x, origin_test_y, 10000, sequence_length, is_2steam=True)
+test_x, test_y, test_xdiff  = reform_to_sequence(origin_test_x, origin_test_y, 15000, sequence_length, is_2steam=True)
 
 
 ### batch Generator
@@ -93,7 +93,7 @@ num_epoch = 100
 for i_ep in range(start_epoch+1,num_epoch):
     
     print('epoch: ', i_ep)
-    train_x, train_y, train_xdiff = reform_to_sequence(origin_train_x, origin_train_y, 5000, sequence_length, is_2steam=True)
+    train_x, train_y, train_xdiff = reform_to_sequence(origin_train_x, origin_train_y, 8000, sequence_length, is_2steam=True)
     # model.fit({'up_stream': train_x, 'down_stream': train_x},
     #           {'main_output': train_y})
     model.fit([train_x, train_xdiff], train_y, epochs=start_epoch+1,

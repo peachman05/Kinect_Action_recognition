@@ -5,19 +5,28 @@ from mpl_toolkits.mplot3d import Axes3D, proj3d
 import matplotlib.animation as animation
 import time
 
-from data_helper import reform_to_sequence
+from data_helper import reform_to_sequence, reduce_joint_dimension
 
 import pickle
 
 sequence_length = 100
-num_joint = 25
-bone_list = [[24,12], [25,12], [12,11], [11,10], [10,9], # right arm
-            [22,8] ,[23,8], [8,7], [7,6], [6,5], # left arm
-            [4,3], [3,21], [9,21], [5,21], [21,2], [2,1], [17,1], [13,1], # body
-            [17,18], [18,19], [19,20], # right leg
-            [13,14], [14,15], [15,16]]
+num_joint = 12 #25
+# bone_list = [[24,12], [25,12], [12,11], [11,10], [10,9], # right arm
+#             [22,8] ,[23,8], [8,7], [7,6], [6,5], # left arm
+#             [4,3], [3,21], [9,21], [5,21], [21,2], [2,1], [17,1], [13,1], # body
+#             [17,18], [18,19], [19,20], # right leg
+#             [13,14], [14,15], [15,16]]
 
-bone_list = np.array(bone_list) - 1
+# choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
+        #                                24, 25, 11, 12, 10, 9, ## right
+        #                              ]) - 1
+# sholder_point = np.array([5, 11])
+# arm_point = np.array([[0,1,2,3,4],[6,7,8,9,10]])
+# bone_list = np.array(bone_list) - 1
+
+bone_list = np.array([[0,3],[1,3],[3,2],[2,4],[4,5], # left
+             [6,9],[7,9],[9,8],[8,10],[10,11]])
+
 
 
 ###################################################################
@@ -31,6 +40,8 @@ f_y = open("{:}/{:}_y.pickle".format(path_save,type_data),'rb')
 
 test_x = pickle.load(f_x)
 test_y = pickle.load(f_y)
+
+test_x = reduce_joint_dimension(test_x,str(num_joint) )
 test_x, test_y = reform_to_sequence(test_x, test_y, 1 , sequence_length)
 
 ###################################################################

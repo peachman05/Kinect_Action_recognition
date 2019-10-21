@@ -62,7 +62,7 @@ def sampling_x(x, sequence_length, up_arm):
     z_random = np.random.uniform(-z_delta, z_delta, 1)
 
     ## change height
-    y_delta = 0.25
+    y_delta = 0.20
     y_random = np.random.uniform(1-y_delta, 1+y_delta, 1)
 
     ## up 2 arm degree
@@ -77,8 +77,8 @@ def sampling_x(x, sequence_length, up_arm):
         #                     [24, 25, 11, 12, 10]]) -1 
         point_per_arm = len(arm_point[0])
 
-        degree_delta = 30
-        degree_random = np.random.uniform(0, degree_delta, 1)
+        degree_delta = 15
+        degree_random = np.random.uniform(-5, degree_delta, 1)
 
     # Randomly choose sample interval and start frame
     sample_interval = np.random.randint(1, random_sample_range + 1)
