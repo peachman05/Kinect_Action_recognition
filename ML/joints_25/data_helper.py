@@ -65,20 +65,33 @@ def sampling_x(x, sequence_length, up_arm):
     y_delta = 0.20
     y_random = np.random.uniform(1-y_delta, 1+y_delta, 1)
 
+
+    sholder_point = np.array([5, 11])
+    arm_point = np.array([[0,1,2,3,4],[6,7,8,9,10]])
+    point_per_arm = len(arm_point[0])
+
+    # up_arm = False
     ## up 2 arm degree
     if up_arm:
         # choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
         #                                24, 25, 11, 12, 10, 9, ## right
         #                              ]) - 1
-        sholder_point = np.array([5, 11])
-        arm_point = np.array([[0,1,2,3,4],[6,7,8,9,10]])
+        ### for 12 joints
+        
+        ### for 25 joints
         # sholder_point = np.array([5, 9]) - 1
         # arm_point = np.array([[22, 23, 7, 8, 6],
         #                     [24, 25, 11, 12, 10]]) -1 
-        point_per_arm = len(arm_point[0])
+
+        
 
         degree_delta = 15
         degree_random = np.random.uniform(-5, degree_delta, 1)
+
+    rotate_body = True
+    if rotate_body:
+        rotate_delta = 110
+        degree_rotate_body = np.random.uniform(-rotate_delta, rotate_delta, 1)
 
     # Randomly choose sample interval and start frame
     sample_interval = np.random.randint(1, random_sample_range + 1)
@@ -114,6 +127,29 @@ def sampling_x(x, sequence_length, up_arm):
 
                 frames[i,2::3] = z
                 frames[i,1::3] = y
+
+            
+            ## rotate body
+            if rotate_body:
+                x = frames[i,0::3]
+                z = frames[i,2::3]
+                x_o = (x[sholder_point[0]] + x[sholder_point[1]])/2  
+                z_o = (z[sholder_point[0]] + z[sholder_point[1]])/2
+                # print("point:",x_o,z_o)
+                all_point = np.append(sholder_point, arm_point)
+
+                for i_p in all_point:
+                    x_p = x[i_p]
+                    z_p = z[i_p]
+                    polar_p = cart2pol([x_o, z_o], [x_p, z_p])
+                    polar_p[1] = polar_p[1] + degree_rotate_body
+                    new_x, new_z = pol2cart(polar_p, [x_o, z_o])
+                    x[i_p] = new_x
+                    z[i_p] = new_z
+                
+                frames[i,0::3] = x
+                frames[i,2::3] = z 
+                
 
 
             image_sequence.append(frames[i])

@@ -50,7 +50,8 @@ choose_joints = np.array([ 22, 23, 7, 8, 6, 5, ## left
 
 
 
-weights_path = 'pretrain_model/up02_2steam-0.86-12j_15t.hdf5' # 15 frame
+#weights_path = 'pretrain_model/up02_2steam-0.86-12j_15t.hdf5' # 15 frame
+weights_path = 'pretrain_model/weight-2steam-0.89-new_rotate_body_15t_12j.hdf5' # 15 frame
 max_frame = 15
 num_joint = 12
 num_plot_joint = 25

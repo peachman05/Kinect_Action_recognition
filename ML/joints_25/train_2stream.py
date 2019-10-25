@@ -13,7 +13,7 @@ from model_ML import create_2stream_model
 
 
 sequence_length = 15 # timestep
-try_detail = "12j_15t"
+try_detail = "new_rotate_body_15t_12j"
 
 #### Prepare data
 path_save = "F:/Master Project/Dataset/Extract_Data/25 joints"

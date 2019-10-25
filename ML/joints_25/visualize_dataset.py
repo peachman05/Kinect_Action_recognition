@@ -32,7 +32,7 @@ if type_file == 'dataset':
     test_x = pickle.load(f_x)
     test_y = pickle.load(f_y)
 
-    num_video = 2
+    num_video = 0
     data_plot = test_x[num_video] 
 
 elif type_file == 'realtime':

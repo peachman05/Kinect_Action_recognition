@@ -92,7 +92,7 @@ lines = [ax.plot([x[bone[0]], x[bone[1]]],
                  [y[bone[0]], y[bone[1]]])[0] for bone in bone_list]
 
 
-num_video = 1900
+num_video = 1000
 print(len(test_x))
 print(test_y[num_video])
 
